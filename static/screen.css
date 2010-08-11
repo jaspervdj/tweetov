@@ -1,0 +1,82 @@
+body {
+    background-color: #333333;
+    font-family: sans-serif;
+    color: #eeeeee;
+    padding-top: 100px;
+    padding-bottom: 100px;
+}
+
+a {
+    color: #a6ec9b;
+    text-decoration: none;
+}
+
+#content, #footer {
+    width: 500px;
+    margin: 0px auto 0px auto;
+}
+
+#content {
+    width: 500px;
+    background-color: #666666;
+    padding: 10px;
+}
+
+#footer {
+    margin-top: 10px;
+    font-size: 12px;
+    font-style: italic;
+    text-align: right;
+}
+
+#footer {
+    color: #888888;
+}
+
+h1 {
+    font-weight: normal;
+    padding: 0px;
+    margin: 0px 0px 10px 0px;
+    font-size: 18px;
+}
+
+#inputsection {
+    margin-bottom: 10px;
+}
+
+#inputsection form {
+    display: inline;
+}
+
+#inputsection form input {
+    font-size: 24px;
+    color: #eeeeee;
+    padding: 1px 10px 1px 10px;
+    border: solid 1px #777777;
+    background-color: #555555;
+}
+
+#inputsection #submitfield {
+    color: #a6ec9b;
+}
+
+#tweetsection {
+    font-family: 'Georgia', serif;
+    font-size: 20px;
+    margin-bottom: 10px;
+    margin-top: 20px;
+}
+
+#usersection {
+    margin-top: 10px;
+}
+
+#usersection img {
+    float: left;
+    margin-right: 10px;
+}
+
+#usersection #username {
+    text-decoration: none;
+    font-size: 18px;
+}
