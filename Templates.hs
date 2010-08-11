@@ -70,7 +70,7 @@ inputSection = H.div ! A.id "inputsection" $ H.form
         \    }\
         \);\
         \ \
-        \$.getJSON('http://api.twitter.com/1/statuses/user_timeline.json?screen_name=' + u + '&count=200&callback=?',\
+        \$.getJSON('http://api.twitter.com/1/statuses/user_timeline.json?screen_name=' + u + '&count=200&trim_user=1&callback=?',\
         \    function(j) {;\
         \        $.get('tweet/', {data: $.toJSON(j)}, function(h) {\
         \            $('#tweet').html(h);\
