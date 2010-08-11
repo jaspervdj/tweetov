@@ -35,6 +35,8 @@ rootTemplate = docTypeHtml $ do
         H.title "Tweetov: Markov chain tweets"
         script ! type_ "text/javascript" ! src "jquery-1.4.2.min.js"
                $ mempty
+        script ! type_ "text/javascript" ! src "jquery.json-2.2.min.js"
+               $ mempty
         link ! rel "stylesheet" ! type_ "text/css" ! href "screen.css"
     body $ do
         H.div ! A.id "content" $ do
@@ -59,12 +61,22 @@ inputSection = H.div ! A.id "inputsection" $ H.form
         "$('#tweet').html('Getting tweets and generating Markov chain...');\
         \$('#user').html('Getting user...');\
         \var u = $('#usernamefield').val();\
-        \$.get('user/' + u, function(data) {\
-        \    $('#user').html(data);\
-        \});\
-        \$.get('tweet/' + u, function(data) {\
-        \    $('#tweet').html(data);\
-        \});\
+        \ \
+        \$.getJSON('http://api.twitter.com/1/users/show.json?screen_name=' + u + '&callback=?',\
+        \    function(j) {;\
+        \        $.get('user/', {data: $.toJSON(j)}, function(h) {\
+        \            $('#user').html(h);\
+        \        });\
+        \    }\
+        \);\
+        \ \
+        \$.getJSON('http://api.twitter.com/1/statuses/user_timeline.json?screen_name=' + u + '&count=200&callback=?',\
+        \    function(j) {;\
+        \        $.get('tweet/', {data: $.toJSON(j)}, function(h) {\
+        \            $('#tweet').html(h);\
+        \        });\
+        \    }\
+        \);\
         \return false;")
     $ do input ! type_ "text" ! name "usernamefield"
                ! A.id "usernamefield" ! value "username"

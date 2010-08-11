@@ -1,19 +1,11 @@
 -- | Twitter-related data structures.
 --
 module Twitter
-    ( Account (..)
-    , UserInfo (..)
+    ( UserInfo (..)
     , TweetInfo (..)
     ) where
 
 import Data.Text (Text)
-
--- | Full account info
---
-data Account = Account
-    { accountUser   :: UserInfo
-    , accountTweets :: [TweetInfo]
-    } deriving (Show, Eq, Ord)
 
 -- | Information about a twitter user
 --

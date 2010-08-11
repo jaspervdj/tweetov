@@ -14,7 +14,7 @@ Executable tweetov
   Main-Is:           Server.hs
   Other-Modules:     Templates,
                      Twitter,
-                     Twitter.Http,
+                     Twitter.Parse,
                      Twitter.Markov
   Build-depends:     base >= 4 && < 5,
                      snap-core >= 0.2,
@@ -26,4 +26,5 @@ Executable tweetov
                      containers >= 0.3,
                      json >= 0.4,
                      HTTP >= 4000,
-                     bytestring >= 0.9
+                     bytestring >= 0.9,
+                     utf8-string >= 0.3

@@ -6,12 +6,13 @@ import Control.Applicative ((<|>))
 import System.Random (RandomGen, newStdGen, randoms)
 import System.Environment (getArgs)
 
-import qualified Data.Text.Encoding as T
+import Codec.Binary.UTF8.String (decode)
+import qualified Data.ByteString as SB
 import Snap.Types
 import Snap.Http.Server (httpServe)
 import Snap.Util.FileServe (fileServe)
 
-import Twitter.Http
+import Twitter.Parse
 import Twitter.Markov
 import Templates
 
@@ -23,12 +24,12 @@ root = setBlaze rootTemplate
 -- | Request a tweet
 --
 tweet :: RandomGen g => g -> Snap ()
-tweet gen = getParam "id" >>= \i -> case i of
-    Nothing -> addBlaze "User not specified."
-    Just userName -> do
-        ut <- liftIO $ getUserTweets $ T.decodeUtf8 userName
+tweet gen = getParam "data" >>= \i -> case i of
+    Nothing -> addBlaze "Params incomplete."
+    Just json -> do
+        let ut = getUserTweets $ decode $ SB.unpack json
         case ut of
-            Nothing -> addBlaze "Twitter error."
+            Nothing -> addBlaze "Parse error."
             Just tweets -> do
                 let model = fromSamples $ map fromTweet tweets
                     t = fromSample $ sentence model $ randoms gen
@@ -37,12 +38,12 @@ tweet gen = getParam "id" >>= \i -> case i of
 -- | Request a user
 --
 user :: Snap ()
-user = getParam "id" >>= \i -> case i of
-    Nothing -> addBlaze "User not specified."
-    Just userName -> do
-        ui <- liftIO $ getUserInfo $ T.decodeUtf8 userName
+user = getParam "data" >>= \i -> case i of
+    Nothing -> addBlaze "Params incomplete."
+    Just json -> do
+        let ui = getUserInfo $ decode $ SB.unpack json
         case ui of
-            Nothing -> addBlaze "Twitter error."
+            Nothing -> addBlaze "Parse error."
             Just userInfo -> addBlaze $ userSection userInfo
 
 -- | Site handler
@@ -52,7 +53,7 @@ site = do
     gen <- liftIO newStdGen
     route [ ("", ifTop root)
           , ("tweet/:id", tweet gen)
-          , ("user/:id", user)
+          , ("user/", user)
           ] <|> fileServe "static"
 
 -- | Main function

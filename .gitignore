@@ -2,3 +2,4 @@ dist
 *.o
 *.hi
 *.swp
+*.log
