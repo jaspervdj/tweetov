@@ -30,14 +30,14 @@ linkWord word
     | T.head word == '#' =
         a ! href ("http://search.twitter.com/search?q=%23"
                     `mappend` textValue tail')
-          $ text word
+          $ preEscapedText word
 
     -- Link
     | "http://" `T.isPrefixOf` word =
-        a ! href (textValue word) $ text word
+        a ! href (textValue word) $ preEscapedText word
 
     -- Regular word
-    | otherwise = text word
+    | otherwise = preEscapedText word
   where
     tail' = T.tail word
 
