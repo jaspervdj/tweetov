@@ -6,6 +6,7 @@ import Control.Applicative ((<|>))
 import System.Random (RandomGen, newStdGen, randoms)
 import System.Environment (getArgs)
 
+import qualified Data.Text as T
 import Codec.Binary.UTF8.String (decode)
 import qualified Data.ByteString as SB
 import Snap.Types
@@ -30,10 +31,8 @@ tweet gen = getParam "data" >>= \i -> case i of
         let ut = getUserTweets $ decode $ SB.unpack json
         case ut of
             Nothing -> addBlaze "Parse error."
-            Just tweets -> do
-                let model = fromSamples $ map fromTweet tweets
-                    t = fromSample $ sentence model $ randoms gen
-                addBlaze $ tweetSection t
+            Just tweets ->
+                addBlaze $ tweetSection $ markovTweet tweets $ randoms gen
 
 -- | Request a user
 --

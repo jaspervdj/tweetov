@@ -91,7 +91,7 @@ inputSection = H.div ! A.id "inputsection" $ H.form
 
 -- | Section containing a tweet.
 --
-tweetSection :: Text -> Html
+tweetSection :: TweetInfo -> Html
 tweetSection t = H.div ! A.id "tweetsection" $ linkTweet t
 
 -- | Section containing the requested twitter user.

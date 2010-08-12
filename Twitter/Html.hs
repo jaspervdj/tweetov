@@ -14,6 +14,8 @@ import Text.Blaze
 import Text.Blaze.Html5 (a)
 import Text.Blaze.Html5.Attributes (href)
 
+import Twitter (TweetInfo, tweetWords)
+
 -- | Produce a link (if necessary) from a word.
 --
 linkWord :: Text -> Html
@@ -43,5 +45,5 @@ linkWord word
 
 -- | Link all words in a tweet.
 --
-linkTweet :: Text -> Html
-linkTweet = mconcat . intersperse " " . map linkWord . T.words
+linkTweet :: TweetInfo -> Html
+linkTweet = mconcat . intersperse " " . map linkWord . tweetWords

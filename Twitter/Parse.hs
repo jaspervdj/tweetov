@@ -44,8 +44,9 @@ getUserTweets body = do
 --
 getTweet :: JSValue -> Maybe TweetInfo
 getTweet value = case value of
-    JSObject object -> liftM TweetInfo (T.pack <$> getField "text" object)
-                           `ap` getField "id" object
+    JSObject object ->
+        liftM TweetInfo (T.words . T.pack <$> getField "text" object)
+            `ap` getField "id" object
     _ -> Nothing 
 
 -- | Auxiliary function: turn a 'Result' into a 'Maybe'.

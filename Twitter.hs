@@ -21,6 +21,6 @@ data UserInfo = UserInfo
 -- | A tweet
 --
 data TweetInfo = TweetInfo
-    { tweetBody :: Text
-    , tweetId   :: Integer
+    { tweetWords :: [Text]
+    , tweetId    :: Integer
     } deriving (Show, Eq, Ord)
