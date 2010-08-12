@@ -61,4 +61,4 @@ main = do
     args <- getArgs
     let port = case args of [p] -> read p
                             _   -> 8000
-    httpServe "*" port "tweetov" (Just "access.log") (Just "error.log") site
+    httpServe "*" port "tweetov" Nothing Nothing site
