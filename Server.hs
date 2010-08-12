@@ -6,7 +6,6 @@ import Control.Applicative ((<|>))
 import System.Random (RandomGen, newStdGen, randoms)
 import System.Environment (getArgs)
 
-import qualified Data.Text as T
 import Codec.Binary.UTF8.String (decode)
 import qualified Data.ByteString as SB
 import Snap.Types

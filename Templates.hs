@@ -4,7 +4,6 @@ module Templates where
 import Prelude
 import Data.Monoid (mempty, mappend)
 
-import Data.Text (Text)
 import Snap.Types (Snap, modifyResponse, addHeader, writeLBS)
 import Text.Blaze.Renderer.Utf8 (renderHtml)
 import Text.Blaze.Html5
@@ -58,12 +57,13 @@ inputSection :: Html
 inputSection = H.div ! A.id "inputsection" $ H.form
     ! onsubmit (preEscapedStringValue
         -- Start loading on submit.
-        "$('#tweet').html('Getting tweets and generating Markov chain...');\
+        "$('#tweet').html('Getting tweets...');\
         \$('#user').html('Getting user...');\
         \var u = $('#usernamefield').val();\
         \ \
         \$.getJSON('http://api.twitter.com/1/users/show.json?screen_name=' + u + '&callback=?',\
         \    function(j) {;\
+        \        $('#user').html('Processing user...');\
         \        $.get('user/', {data: $.toJSON(j)}, function(h) {\
         \            $('#user').html(h);\
         \        });\
@@ -72,6 +72,7 @@ inputSection = H.div ! A.id "inputsection" $ H.form
         \ \
         \$.getJSON('http://api.twitter.com/1/statuses/user_timeline.json?screen_name=' + u + '&count=200&trim_user=1&callback=?',\
         \    function(j) {;\
+        \        $('#tweet').html('Generating tweet...');\
         \        $.get('tweet/', {data: $.toJSON(j)}, function(h) {\
         \            $('#tweet').html(h);\
         \        });\

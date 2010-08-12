@@ -7,6 +7,7 @@ module Twitter.Markov
 
 import Data.Text (Text)
 import qualified Data.Text as T
+import Data.Char (isAlphaNum)
 
 import Twitter (TweetInfo (..))
 import Data.Markov
@@ -16,7 +17,10 @@ import Data.Markov
 sampleFromTweet :: TweetInfo -> Sample Text
 sampleFromTweet = Sample . filter (not . T.null)
                 . map (T.filter (`notElem` "()\""))
+                . filter goodWord
                 . tweetWords
+  where
+    goodWord = T.any isAlphaNum
 
 -- | Generate a random tweet
 --
