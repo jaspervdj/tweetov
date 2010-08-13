@@ -36,6 +36,7 @@ rootTemplate = docTypeHtml $ do
                $ mempty
         script ! type_ "text/javascript" ! src "jquery.json-2.2.min.js"
                $ mempty
+        script ! type_ "text/javascript" ! src "tweetov.js" $ mempty
         link ! rel "stylesheet" ! type_ "text/css" ! href "screen.css"
     body $ do
         H.div ! A.id "content" $ do
@@ -55,30 +56,7 @@ rootTemplate = docTypeHtml $ do
 --
 inputSection :: Html
 inputSection = H.div ! A.id "inputsection" $ H.form
-    ! onsubmit (preEscapedStringValue
-        -- Start loading on submit.
-        "$('#tweet').html('Getting tweets...');\
-        \$('#user').html('Getting user...');\
-        \var u = $('#usernamefield').val();\
-        \ \
-        \$.getJSON('http://api.twitter.com/1/users/show.json?screen_name=' + u + '&callback=?',\
-        \    function(j) {;\
-        \        $('#user').html('Processing user...');\
-        \        $.get('user/', {data: $.toJSON(j)}, function(h) {\
-        \            $('#user').html(h);\
-        \        });\
-        \    }\
-        \);\
-        \ \
-        \$.getJSON('http://api.twitter.com/1/statuses/user_timeline.json?screen_name=' + u + '&count=200&trim_user=1&callback=?',\
-        \    function(j) {;\
-        \        $('#tweet').html('Generating tweet...');\
-        \        $.get('tweet/', {data: $.toJSON(j)}, function(h) {\
-        \            $('#tweet').html(h);\
-        \        });\
-        \    }\
-        \);\
-        \return false;")
+    ! onsubmit "return submit_username();"
     $ do input ! type_ "text" ! name "usernamefield"
                ! A.id "usernamefield" ! value "username"
                -- Clear field on click.
