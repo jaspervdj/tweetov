@@ -28,4 +28,5 @@ Executable tweetov
                      json >= 0.4,
                      HTTP >= 4000,
                      bytestring >= 0.9,
-                     utf8-string >= 0.3
+                     utf8-string >= 0.3,
+                     redis >= 0.7

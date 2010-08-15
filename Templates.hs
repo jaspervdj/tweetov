@@ -11,6 +11,7 @@ import qualified Text.Blaze.Html5 as H
 import Text.Blaze.Html5.Attributes
 import qualified Text.Blaze.Html5.Attributes as A
 import qualified Data.Text as T
+import Data.Text (Text)
 
 import Twitter
 import Twitter.Html (linkTweet)
@@ -29,8 +30,10 @@ addBlaze = writeLBS . renderHtml
 
 -- | The root page of the web app.
 --
-rootTemplate :: Html
-rootTemplate = docTypeHtml $ do
+rootTemplate :: Html  -- ^ Tweet section contents
+             -> Html  -- ^ User section contents
+             -> Html
+rootTemplate tweetSection' userSection' = docTypeHtml $ do
     H.head $ do
         H.title "Tweetov: Markov chain tweets"
         script ! type_ "text/javascript" ! src "jquery-1.4.2.min.js"
@@ -43,8 +46,8 @@ rootTemplate = docTypeHtml $ do
         H.div ! A.id "content" $ do
             h1 "Tweetov: Markov chain tweets"
             inputSection
-            H.div ! A.id "tweet" $ mempty
-            H.div ! A.id "user" $ mempty
+            H.div ! A.id "tweet" $ tweetSection'
+            H.div ! A.id "user" $ userSection'
             H.div ! A.style "clear: both;" $ mempty
         H.div ! A.id "footer" $ do
             "Tweets of insanity by "
@@ -71,9 +74,19 @@ inputSection = H.div ! A.id "inputsection" $ H.form
 
 -- | Section containing a tweet.
 --
-tweetSection :: TweetInfo -> Html
-tweetSection t = H.div ! A.id "tweetsection" $ do
-    linkTweet t
+tweetSection :: TweetInfo -> Integer -> Html
+tweetSection tweet id' = H.div ! A.id "tweetsection" $ do
+    H.div ! A.id "tweet" $ linkTweet tweet
+    H.div ! A.id "perma" $ do
+        "["
+        a ! href (stringValue $ show id') $ "permalink"
+        "]"
+
+-- | Produces a script to set the user
+--
+setUser :: Text -> Html
+setUser user = script ! type_ "text/javascript" $
+    "set_user('" >> text user >> "');"
 
 -- | Section containing the requested twitter user.
 --

@@ -13,16 +13,8 @@ function submit_username() {
 
     user = val;
     $('#tweet').html('Getting tweets...');
-    $('#user').html('Getting user...');
-     
-    $.getJSON('http://api.twitter.com/1/users/show.json?screen_name=' + user + '&callback=?',
-        function(j) {
-            $('#user').html('Processing user...');
-            $.get('user/', {data: $.toJSON(j)}, function(h) {
-                $('#user').html(h);
-            });
-        }
-    );
+
+    set_user(user);
      
     $.getJSON('http://api.twitter.com/1/statuses/user_timeline.json?screen_name=' + user + '&count=200&trim_user=1&callback=?',
         function(j) {
@@ -32,6 +24,19 @@ function submit_username() {
     );
 
     return false;
+}
+
+function set_user(u) {
+    $('#user').html('Getting user...');
+    $('#usernamefield').val(u);
+    $.getJSON('http://api.twitter.com/1/users/show.json?screen_name=' + u + '&callback=?',
+        function(j) {
+            $('#user').html('Processing user...');
+            $.get('user/', {data: $.toJSON(j)}, function(h) {
+                $('#user').html(h);
+            });
+        }
+    );
 }
 
 function generate_tweet(d) {

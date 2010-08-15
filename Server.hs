@@ -5,6 +5,7 @@ import Control.Monad.Trans (liftIO)
 import Control.Applicative ((<|>))
 import System.Random (RandomGen, newStdGen, randoms)
 import System.Environment (getArgs)
+import Data.Monoid (mempty, mempty)
 
 import Codec.Binary.UTF8.String (decode)
 import qualified Data.ByteString as SB
@@ -14,14 +15,16 @@ import Snap.Util.FileServe (fileServe)
 import qualified Data.Text.Encoding as T
 import Text.Blaze (unsafeByteString)
 
+import Twitter
 import Twitter.Parse
 import Twitter.Markov
+import Twitter.Redis
 import Templates
 
 -- | Site root
 --
 root :: Snap ()
-root = setBlaze rootTemplate
+root = setBlaze $ rootTemplate mempty mempty
 
 -- | Progress using a parameter
 --
@@ -46,8 +49,10 @@ tweet gen = withParam "data" $ \json -> withParam "user" $ \user' -> do
         r = randoms gen
     case ut of
         Nothing -> addBlaze "Parse error."
-        Just tweets ->
-            addBlaze $ tweetSection $ markovTweet user tweets r
+        Just tweets -> do
+            let tweet = markovTweet user tweets r
+            id' <- liftIO $ storeTweet tweet
+            addBlaze $ tweetSection tweet id'
 
 -- | Request a user
 --
@@ -58,15 +63,27 @@ user = withParam "data" $ \json ->
         Nothing -> addBlaze "Parse error."
         Just userInfo -> addBlaze $ userSection userInfo
 
+-- | Link to a tweet
+--
+perma :: Snap ()
+perma = withParam "id" $ \id' -> do
+    let nid = read $ decode $ SB.unpack id'
+    t <- liftIO $ getTweet nid
+    case t of
+        Nothing -> setBlaze "Tweet not found."
+        Just tweet -> setBlaze $ rootTemplate (tweetSection tweet nid)
+                                              (setUser $ tweetAuthor tweet)
+
 -- | Site handler
 --
 site :: Snap ()
 site = do
     gen <- liftIO newStdGen
-    route [ ("", ifTop root)
-          , ("tweet/:id", tweet gen)
-          , ("user/", user)
-          ] <|> fileServe "static"
+    fileServe "static" <|> route [ ("", ifTop root)
+                                 , ("tweet/:id", tweet gen)
+                                 , ("user/", user)
+                                 , (":id", perma)
+                                 ] 
 
 -- | Main function
 --
@@ -75,4 +92,4 @@ main = do
     args <- getArgs
     let port = case args of [p] -> read p
                             _   -> 8000
-    httpServe "*" port "tweetov" Nothing Nothing site
+    httpServe "*" port "tweetov" Nothing (Just "error.log") site
