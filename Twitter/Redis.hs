@@ -10,7 +10,7 @@ import qualified Data.ByteString as SB
 import qualified Data.ByteString.Char8 as SBC
 import qualified Data.ByteString.Lazy as LB
 import qualified Data.ByteString.Lazy.Char8 as LBC
-import Data.Binary (Binary, encode, decode)
+import Data.Binary (encode, decode)
 import Database.Redis.Redis
 import Data.Monoid (mappend)
 

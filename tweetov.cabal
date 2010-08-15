@@ -16,6 +16,7 @@ Executable tweetov
                      Twitter,
                      Twitter.Parse,
                      Twitter.Markov,
+                     Twitter.Redis,
                      Data.Markov
   Build-depends:     base >= 4 && < 5,
                      snap-core >= 0.2,
@@ -29,4 +30,5 @@ Executable tweetov
                      HTTP >= 4000,
                      bytestring >= 0.9,
                      utf8-string >= 0.3,
-                     redis >= 0.7
+                     redis >= 0.7,
+                     binary >= 0.5

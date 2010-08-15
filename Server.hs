@@ -43,16 +43,16 @@ withParam name handler = do
 -- | Request a tweet
 --
 tweet :: RandomGen g => g -> Snap ()
-tweet gen = withParam "data" $ \json -> withParam "user" $ \user' -> do
+tweet gen = withParam "data" $ \json -> withParam "user" $ \u -> do
     let ut = getUserTweets $ decode $ SB.unpack json
-        user = T.decodeUtf8 user'
+        user' = T.decodeUtf8 u
         r = randoms gen
     case ut of
         Nothing -> addBlaze "Parse error."
         Just tweets -> do
-            let tweet = markovTweet user tweets r
-            id' <- liftIO $ storeTweet tweet
-            addBlaze $ tweetSection tweet id'
+            let tweet' = markovTweet user' tweets r
+            id' <- liftIO $ storeTweet tweet'
+            addBlaze $ tweetSection tweet' id'
 
 -- | Request a user
 --
@@ -71,8 +71,8 @@ perma = withParam "id" $ \id' -> do
     t <- liftIO $ getTweet nid
     case t of
         Nothing -> setBlaze "Tweet not found."
-        Just tweet -> setBlaze $ rootTemplate (tweetSection tweet nid)
-                                              (setUser $ tweetAuthor tweet)
+        Just tweet' -> setBlaze $ rootTemplate (tweetSection tweet' nid)
+                                               (setUser $ tweetAuthor tweet')
 
 -- | Site handler
 --
