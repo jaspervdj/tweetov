@@ -36,7 +36,7 @@ function submit_username() {
 
 function generate_tweet(d) {
     $('#tweet').html('Generating tweet...');
-    $.get('tweet/', {data: d}, function(h) {
+    $.get('tweet/', {data: d, user: user}, function(h) {
         $('#tweet').html(h);
     });
 }

@@ -11,6 +11,8 @@ import qualified Data.ByteString as SB
 import Snap.Types
 import Snap.Http.Server (httpServe)
 import Snap.Util.FileServe (fileServe)
+import qualified Data.Text.Encoding as T
+import Text.Blaze (unsafeByteString)
 
 import Twitter.Parse
 import Twitter.Markov
@@ -21,28 +23,40 @@ import Templates
 root :: Snap ()
 root = setBlaze rootTemplate
 
+-- | Progress using a parameter
+--
+withParam :: SB.ByteString               -- ^ Param name
+          -> (SB.ByteString -> Snap ())  -- ^ Handler
+          -> Snap ()                     -- ^ Result
+withParam name handler = do
+    value <- getParam name
+    case value of
+        Just v  -> handler v
+        Nothing -> setBlaze $ do
+            "Error: param "
+            unsafeByteString name
+            " not set"
+
 -- | Request a tweet
 --
 tweet :: RandomGen g => g -> Snap ()
-tweet gen = getParam "data" >>= \i -> case i of
-    Nothing -> addBlaze "Params incomplete."
-    Just json -> do
-        let ut = getUserTweets $ decode $ SB.unpack json
-        case ut of
-            Nothing -> addBlaze "Parse error."
-            Just tweets ->
-                addBlaze $ tweetSection $ markovTweet tweets $ randoms gen
+tweet gen = withParam "data" $ \json -> withParam "user" $ \user' -> do
+    let ut = getUserTweets $ decode $ SB.unpack json
+        user = T.decodeUtf8 user'
+        r = randoms gen
+    case ut of
+        Nothing -> addBlaze "Parse error."
+        Just tweets ->
+            addBlaze $ tweetSection $ markovTweet user tweets r
 
 -- | Request a user
 --
 user :: Snap ()
-user = getParam "data" >>= \i -> case i of
-    Nothing -> addBlaze "Params incomplete."
-    Just json -> do
-        let ui = getUserInfo $ decode $ SB.unpack json
-        case ui of
-            Nothing -> addBlaze "Parse error."
-            Just userInfo -> addBlaze $ userSection userInfo
+user = withParam "data" $ \json ->
+    let ui = getUserInfo $ decode $ SB.unpack json
+    in case ui of
+        Nothing -> addBlaze "Parse error."
+        Just userInfo -> addBlaze $ userSection userInfo
 
 -- | Site handler
 --

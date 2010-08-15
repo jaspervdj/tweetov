@@ -10,6 +10,7 @@ import Text.Blaze.Html5
 import qualified Text.Blaze.Html5 as H
 import Text.Blaze.Html5.Attributes
 import qualified Text.Blaze.Html5.Attributes as A
+import qualified Data.Text as T
 
 import Twitter
 import Twitter.Html (linkTweet)
@@ -71,7 +72,8 @@ inputSection = H.div ! A.id "inputsection" $ H.form
 -- | Section containing a tweet.
 --
 tweetSection :: TweetInfo -> Html
-tweetSection t = H.div ! A.id "tweetsection" $ linkTweet t
+tweetSection t = H.div ! A.id "tweetsection" $ do
+    linkTweet t
 
 -- | Section containing the requested twitter user.
 --

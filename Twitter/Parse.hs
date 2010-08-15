@@ -1,5 +1,6 @@
 -- | Parse Twitter data.
 --
+{-# LANGUAGE OverloadedStrings #-}
 module Twitter.Parse
     ( getUserInfo
     , getUserTweets
@@ -46,7 +47,8 @@ getTweet :: JSValue -> Maybe TweetInfo
 getTweet value = case value of
     JSObject object ->
         liftM TweetInfo (T.words . T.pack <$> getField "text" object)
-            `ap` getField "id" object
+            -- Do not parse user for now
+            `ap` return "unknown"
     _ -> Nothing 
 
 -- | Auxiliary function: turn a 'Result' into a 'Maybe'.

@@ -24,12 +24,15 @@ sampleFromTweet = Sample . filter (not . T.null)
 
 -- | Generate a random tweet
 --
-markovTweet :: [TweetInfo] -> [Int] -> TweetInfo
-markovTweet tweets seeds =
+markovTweet :: Text         -- ^ Author
+            -> [TweetInfo]  -- ^ Tweet samples
+            -> [Int]        -- ^ Random pool
+            -> TweetInfo    -- ^ Result
+markovTweet auhor tweets seeds =
     let samples = map sampleFromTweet tweets
         model = fromSamples True samples
     in TweetInfo { tweetWords = sentence tooLarge model seeds
-                 , tweetId    = 0
+                 , tweetAuthor = auhor
                  }
 
 -- | Check if a tweet is already too large
