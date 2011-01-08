@@ -28,11 +28,11 @@ markovTweet :: Text         -- ^ Author
             -> [TweetInfo]  -- ^ Tweet samples
             -> [Int]        -- ^ Random pool
             -> TweetInfo    -- ^ Result
-markovTweet auhor tweets seeds =
+markovTweet author tweets seeds =
     let samples = map sampleFromTweet tweets
         model = fromSamples True samples
-    in TweetInfo { tweetWords = sentence tooLarge model seeds
-                 , tweetAuthor = auhor
+    in TweetInfo { tweetWords  = sentence tooLarge model seeds
+                 , tweetAuthor = author
                  }
 
 -- | Check if a tweet is already too large
