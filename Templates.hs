@@ -77,9 +77,7 @@ tweetSection :: TweetInfo -> Integer -> Html
 tweetSection tweet id' = H.div ! A.id "tweetsection" $ do
     H.div ! A.id "tweet" $ linkTweet tweet
     H.div ! A.id "perma" $ do
-        "["
-        a ! href (stringValue $ show id') $ "permalink"
-        "]"
+        a ! href (stringValue $ show id') $ "link (expires)"
 
 -- | Produces a script to set the user
 --
