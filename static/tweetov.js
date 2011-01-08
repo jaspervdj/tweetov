@@ -32,7 +32,7 @@ function set_user(u) {
     $.getJSON('http://api.twitter.com/1/users/show.json?screen_name=' + u + '&callback=?',
         function(j) {
             $('#user').html('Processing user...');
-            $.get('user/', {data: $.toJSON(j)}, function(h) {
+            $.post('user/', {data: $.toJSON(j)}, function(h) {
                 $('#user').html(h);
             });
         }
@@ -41,7 +41,7 @@ function set_user(u) {
 
 function generate_tweet(d) {
     $('#tweet').html('Generating tweet...');
-    $.get('tweet/', {data: d, user: user}, function(h) {
+    $.post('tweet/', {data: d, user: user}, function(h) {
         $('#tweet').html(h);
     });
 }
