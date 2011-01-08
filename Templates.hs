@@ -76,7 +76,7 @@ inputSection = H.div ! A.id "inputsection" $ H.form
 tweetSection :: TweetInfo -> Integer -> Html
 tweetSection tweet id' = H.div ! A.id "tweetsection" $ do
     H.div ! A.id "tweet" $ linkTweet tweet
-    H.div ! A.id "perma" $ do
+    H.div ! A.id "tweetlink" $
         a ! href (stringValue $ show id') $ "link (expires)"
 
 -- | Produces a script to set the user
