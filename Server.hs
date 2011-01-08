@@ -4,13 +4,15 @@ module Main where
 import Control.Monad.Trans (liftIO)
 import Control.Applicative ((<|>))
 import System.Random (RandomGen, newStdGen, randoms)
-import System.Environment (getArgs)
 import Data.Monoid (mempty, mempty)
 
 import Codec.Binary.UTF8.String (decode)
 import qualified Data.ByteString as SB
 import Snap.Types
-import Snap.Http.Server (httpServe)
+import Snap.Http.Server (httpServe) 
+import Snap.Http.Server.Config ( Config, defaultConfig
+                               , setAccessLog, setErrorLog
+                               )
 import Snap.Util.FileServe (fileServe)
 import qualified Data.Text.Encoding as T
 import Text.Blaze (unsafeByteString)
@@ -88,8 +90,11 @@ site = do
 -- | Main function
 --
 main :: IO ()
-main = do
-    args <- getArgs
-    let port = case args of [p] -> read p
-                            _   -> 8000
-    httpServe "*" port "tweetov" Nothing (Just "error.log") site
+main = httpServe config site
+
+-- | Site config
+--
+config :: Config Snap a
+config = setAccessLog Nothing
+       $ setErrorLog Nothing
+       $ defaultConfig
