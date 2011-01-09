@@ -2,6 +2,7 @@
 module Twitter.Redis
     ( storeTweet
     , getTweet
+    , getNumberOfTweets
     ) where
 
 import Data.Maybe (fromMaybe)
@@ -48,6 +49,13 @@ storeTweet tweet = withRedis $ \redis -> do
     setItem redis (getTweetKey id') $ encode tweet
     setItem redis "next-id" $ LBC.pack $ show $ id' + 1
     return id'
+
+-- | Get the number of tweets
+--
+getNumberOfTweets :: IO Integer
+getNumberOfTweets = withRedis $ \redis -> do
+    id' <- getItem redis "next-id"
+    return $ fromMaybe 0 $ fmap (read . LBC.unpack) id'
 
 -- | Get a tweet from the database
 --
