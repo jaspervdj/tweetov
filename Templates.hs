@@ -50,7 +50,7 @@ rootTemplate tweetSection' userSection' = docTypeHtml $ do
             H.div ! A.style "clear: both;" $ mempty
         H.div ! A.id "footer" $ do
             "Tweets of insanity by "
-            a ! href "http://jaspervdj.be" $ "jaspervdj"
+            a ! href "http://twitter.com/jaspervdj" $ "@jaspervdj"
             " ("
             a ! href "http://github.com/jaspervdj/tweetov" $ "source code"
             ")"
