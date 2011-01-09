@@ -75,7 +75,7 @@ inputSection = H.div ! A.id "inputsection" $ H.form
 
 -- | Section containing a tweet.
 --
-tweetSection :: TweetInfo -> Integer -> Html
+tweetSection :: TweetInfo -> Int -> Html
 tweetSection tweet id' = H.div ! A.id "tweetsection" $ do
     H.div ! A.id "tweet" $ linkTweet tweet
     H.div ! A.id "tweetlink" $

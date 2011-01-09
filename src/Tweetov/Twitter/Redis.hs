@@ -34,6 +34,14 @@ getItem redis key = do
     return $ case reply of RBulk (Just r) -> Just r
                            _              -> Nothing
 
+-- | Generate a new tweet ID, atomically
+--
+getNewTweetID :: Redis -> IO Int
+getNewTweetID redis = do
+    reply <- incr redis ("next-id" :: SB.ByteString)
+    return $ case reply of (RInt x) -> x
+                           _        -> 0
+
 -- | Store an item in the redis database
 --
 setItem :: Redis -> SB.ByteString -> LB.ByteString -> IO ()
@@ -43,28 +51,27 @@ setItem redis key item = do
 
 -- | Store a tweet in the database
 --
-storeTweet :: TweetInfo -> IO Integer
+storeTweet :: TweetInfo -> IO Int
 storeTweet tweet = withRedis $ \redis -> do
-    id' <- read . LBC.unpack . fromMaybe "1" <$> getItem redis "next-id"
+    id' <- getNewTweetID redis
     setItem redis (getTweetKey id') $ encode tweet
-    setItem redis "next-id" $ LBC.pack $ show $ id' + 1
     return id'
 
 -- | Get the number of tweets
 --
-getNumberOfTweets :: IO Integer
+getNumberOfTweets :: IO Int
 getNumberOfTweets = withRedis $ \redis -> do
     id' <- getItem redis "next-id"
     return $ fromMaybe 0 $ fmap (read . LBC.unpack) id'
 
 -- | Get a tweet from the database
 --
-getTweet :: Integer -> IO (Maybe TweetInfo)
+getTweet :: Int -> IO (Maybe TweetInfo)
 getTweet id' = withRedis $ \redis -> do
     item <- getItem redis $ getTweetKey id'
     return $ decode <$> item
 
 -- | Get an id for a tweet
 --
-getTweetKey :: Integer -> SB.ByteString
+getTweetKey :: Int -> SB.ByteString
 getTweetKey id' = "tweet:" `mappend` SBC.pack (show id')
