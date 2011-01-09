@@ -61,7 +61,7 @@ inputSection :: Html
 inputSection = H.div ! A.id "inputsection" $ H.form
     ! onsubmit "return submit_username();"
     $ do input ! type_ "text" ! name "usernamefield"
-               ! A.id "usernamefield" ! value "username"
+               ! A.id "usernamefield" ! value "DalaiLama"
                -- Clear field on click.
                ! onfocus (preEscapedStringValue
                      "if(this.value == this.defaultValue) {\
