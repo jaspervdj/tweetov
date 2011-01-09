@@ -1,7 +1,7 @@
 -- | Parse Twitter data.
 --
 {-# LANGUAGE OverloadedStrings #-}
-module Twitter.Parse
+module Tweetov.Twitter.Parse
     ( getUserInfo
     , getUserTweets
     ) where
@@ -13,7 +13,7 @@ import Data.Maybe (mapMaybe)
 import qualified Data.Text as T
 import Text.JSON
 
-import Twitter (UserInfo (..), TweetInfo (..))
+import Tweetov.Twitter (UserInfo (..), TweetInfo (..))
 
 -- | Load information about a twitter user
 --

@@ -1,6 +1,6 @@
 -- | Markov chain data structure
 --
-module Data.Markov
+module Tweetov.Data.Markov
     ( Sample (..)
     , Distribution
     , Model

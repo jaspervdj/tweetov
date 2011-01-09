@@ -1,6 +1,6 @@
 -- | Twitter-related data structures.
 --
-module Twitter
+module Tweetov.Twitter
     ( UserInfo (..)
     , TweetInfo (..)
     ) where

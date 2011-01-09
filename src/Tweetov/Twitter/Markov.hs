@@ -1,7 +1,7 @@
 -- | Generate tweets based on markov chains.
 --
 {-# LANGUAGE OverloadedStrings #-}
-module Twitter.Markov
+module Tweetov.Twitter.Markov
     ( markovTweet
     ) where
 
@@ -9,8 +9,8 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import Data.Char (isAlphaNum)
 
-import Twitter (TweetInfo (..))
-import Data.Markov
+import Tweetov.Twitter (TweetInfo (..))
+import Tweetov.Data.Markov
 
 -- | Extract a 'Sample' from a tweet.
 --

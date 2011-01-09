@@ -1,7 +1,7 @@
 -- | Analysis of the tweetov data
 --
 {-# LANGUAGE OverloadedStrings #-}
-module Analysis
+module Tweetov.Analysis
     ( perUserMap
     , perUserNumber
     ) where
@@ -16,8 +16,8 @@ import qualified Data.Vector as V
 import Data.Monoid (mappend)
 import qualified Data.Text as T
 
-import Twitter
-import Twitter.Redis
+import Tweetov.Twitter
+import Tweetov.Twitter.Redis
 
 -- | Create a map with the tweets per user
 --

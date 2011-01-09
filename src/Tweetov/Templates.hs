@@ -1,5 +1,7 @@
+-- | Contains the blaze-html templates for the site
+--
 {-# LANGUAGE OverloadedStrings #-}
-module Templates where
+module Tweetov.Templates where
 
 import Prelude
 import Data.Monoid (mempty, mappend)
@@ -12,8 +14,8 @@ import Text.Blaze.Html5.Attributes
 import qualified Text.Blaze.Html5.Attributes as A
 import Data.Text (Text)
 
-import Twitter
-import Twitter.Html (linkTweet)
+import Tweetov.Twitter
+import Tweetov.Twitter.Html (linkTweet)
 
 -- | Send blaze output to snap.
 --

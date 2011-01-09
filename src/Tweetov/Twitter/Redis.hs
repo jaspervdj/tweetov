@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Twitter.Redis
+module Tweetov.Twitter.Redis
     ( storeTweet
     , getTweet
     , getNumberOfTweets
@@ -15,7 +15,7 @@ import Data.Binary (encode, decode)
 import Database.Redis.Redis
 import Data.Monoid (mappend)
 
-import Twitter
+import Tweetov.Twitter
 
 -- | Run an action with a redis connection
 --

@@ -17,11 +17,11 @@ import Snap.Util.FileServe (fileServe)
 import qualified Data.Text.Encoding as T
 import Text.Blaze (unsafeByteString)
 
-import Twitter
-import Twitter.Parse
-import Twitter.Markov
-import Twitter.Redis
-import Templates
+import Tweetov.Twitter
+import Tweetov.Twitter.Parse
+import Tweetov.Twitter.Markov
+import Tweetov.Twitter.Redis
+import Tweetov.Templates
 
 -- | Site root
 --

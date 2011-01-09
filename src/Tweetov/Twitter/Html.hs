@@ -1,7 +1,7 @@
 -- | Produce HTML from Twitter data structures.
 --
 {-# LANGUAGE OverloadedStrings #-}
-module Twitter.Html
+module Tweetov.Twitter.Html
     ( linkTweet
     ) where
 
@@ -14,7 +14,7 @@ import Text.Blaze
 import Text.Blaze.Html5 (a)
 import Text.Blaze.Html5.Attributes (href)
 
-import Twitter (TweetInfo, tweetWords)
+import Tweetov.Twitter (TweetInfo, tweetWords)
 
 -- | Produce a link (if necessary) from a word.
 --
