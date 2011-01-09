@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Tweetov.Twitter.Redis
-    ( storeTweet
+    ( withRedis
+    , storeTweet
     , getTweet
     , getNumberOfTweets
     ) where
@@ -51,23 +52,23 @@ setItem redis key item = do
 
 -- | Store a tweet in the database
 --
-storeTweet :: TweetInfo -> IO Int
-storeTweet tweet = withRedis $ \redis -> do
+storeTweet :: Redis -> TweetInfo -> IO Int
+storeTweet redis tweet = do
     id' <- getNewTweetID redis
     setItem redis (getTweetKey id') $ encode tweet
     return id'
 
 -- | Get the number of tweets
 --
-getNumberOfTweets :: IO Int
-getNumberOfTweets = withRedis $ \redis -> do
+getNumberOfTweets :: Redis -> IO Int
+getNumberOfTweets redis = do
     id' <- getItem redis "next-id"
     return $ fromMaybe 0 $ fmap (read . LBC.unpack) id'
 
 -- | Get a tweet from the database
 --
-getTweet :: Int -> IO (Maybe TweetInfo)
-getTweet id' = withRedis $ \redis -> do
+getTweet :: Redis -> Int -> IO (Maybe TweetInfo)
+getTweet redis id' = do
     item <- getItem redis $ getTweetKey id'
     return $ decode <$> item
 

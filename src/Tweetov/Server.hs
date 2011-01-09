@@ -48,12 +48,12 @@ tweet :: RandomGen g => g -> Snap ()
 tweet gen = withParam "data" $ \json -> withParam "user" $ \u -> do
     let ut = getUserTweets $ decode $ SB.unpack json
         user' = T.decodeUtf8 u
-        r = randoms gen
+        randoms' = randoms gen
     case ut of
         Nothing -> addBlaze "Parse error."
         Just tweets -> do
-            let tweet' = markovTweet user' tweets r
-            id' <- liftIO $ storeTweet tweet'
+            let tweet' = markovTweet user' tweets randoms'
+            id' <- liftIO $ withRedis $ \r -> storeTweet r tweet'
             addBlaze $ tweetSection tweet' id'
 
 -- | Request a user
@@ -67,10 +67,10 @@ user = withParam "data" $ \json ->
 
 -- | Link to a tweet
 --
-perma :: Snap ()
-perma = withParam "id" $ \id' -> do
+tweetLink :: Snap ()
+tweetLink = withParam "id" $ \id' -> do
     let nid = read $ decode $ SB.unpack id'
-    t <- liftIO $ getTweet nid
+    t <- liftIO $ withRedis $ \r -> getTweet r nid
     case t of
         Nothing -> setBlaze "Tweet not found."
         Just tweet' -> setBlaze $ rootTemplate (tweetSection tweet' nid)
@@ -84,7 +84,7 @@ site = do
     fileServe "static" <|> route [ ("", ifTop root)
                                  , ("tweet/:id", tweet gen)
                                  , ("user/", user)
-                                 , (":id", perma)
+                                 , (":id", tweetLink)
                                  ] 
 
 -- | Main function

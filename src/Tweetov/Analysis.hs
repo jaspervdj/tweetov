@@ -22,11 +22,11 @@ import Tweetov.Twitter.Redis
 -- | Create a map with the tweets per user
 --
 perUserMap :: IO (Map Text (Vector TweetInfo))
-perUserMap = do
-    n <- getNumberOfTweets
-    foldM addTweet M.empty [0 .. n]
+perUserMap = withRedis $ \redis -> do
+    n <- getNumberOfTweets redis
+    foldM (addTweet redis) M.empty [0 .. n]
   where
-    addTweet map' n = getTweet n >>= \r -> return $ case r of
+    addTweet redis map' n = getTweet redis n >>= \r -> return $ case r of
         Nothing -> map'
         Just ti -> M.insertWith mappend (author ti) (V.singleton ti) map'
 
