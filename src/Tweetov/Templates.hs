@@ -39,7 +39,7 @@ rootTemplate tweetSection' userSection' = docTypeHtml $ do
         H.title "Tweetov: Markov chain tweets"
         script ! type_ "text/javascript" ! src "jquery-1.4.2.min.js"
                $ mempty
-        script ! type_ "text/javascript" ! src "jquery.json-2.2.min.js"
+        script ! type_ "text/javascript" ! src "json2.js"
                $ mempty
         script ! type_ "text/javascript" ! src "tweetov.js" $ mempty
         link ! rel "stylesheet" ! type_ "text/css" ! href "screen.css"

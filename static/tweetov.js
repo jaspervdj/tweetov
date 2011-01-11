@@ -17,13 +17,24 @@ function submit_username() {
     set_user(user);
      
     $.getJSON('http://api.twitter.com/1/statuses/user_timeline.json?screen_name=' + user + '&count=200&trim_user=1&callback=?',
-        function(j) {
-            tweet_data = $.toJSON(j);
+        function(tweets) {
+            minify_tweets(tweets);
+            tweet_data = JSON.stringify(tweets);
             generate_tweet(tweet_data);
         }
     );
 
     return false;
+}
+
+/* Minify tweets returned by twitter: only keep the fields we really need */
+function minify_tweets(tweets) {
+    for(var i in tweets) {
+        /* Created a new tweet object, with only the needed fields. Then
+         * set this in the array that we will send to the server. */
+        var tweet = {"text": tweets[i].text}
+        tweets[i] = tweet;
+    }
 }
 
 function set_user(u) {
@@ -32,7 +43,7 @@ function set_user(u) {
     $.getJSON('http://api.twitter.com/1/users/show.json?screen_name=' + u + '&callback=?',
         function(j) {
             $('#user').html('Processing user...');
-            $.post('user/', {data: $.toJSON(j)}, function(h) {
+            $.post('user/', {data: JSON.stringify(j)}, function(h) {
                 $('#user').html(h);
             });
         }
