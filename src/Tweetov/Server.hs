@@ -13,7 +13,7 @@ import Snap.Http.Server (httpServe)
 import Snap.Http.Server.Config ( Config, defaultConfig
                                , setAccessLog, setErrorLog
                                )
-import Snap.Util.FileServe (fileServe)
+import Snap.Util.FileServe (serveDirectory)
 import qualified Data.Text.Encoding as T
 import Text.Blaze (unsafeByteString)
 
@@ -81,11 +81,11 @@ tweetLink = withParam "id" $ \id' -> do
 site :: Snap ()
 site = do
     gen <- liftIO newStdGen
-    fileServe "static" <|> route [ ("", ifTop root)
-                                 , ("tweet/:id", tweet gen)
-                                 , ("user/", user)
-                                 , (":id", tweetLink)
-                                 ] 
+    serveDirectory "static" <|> route [ ("", ifTop root)
+                                      , ("tweet/:id", tweet gen)
+                                      , ("user/", user)
+                                      , (":id", tweetLink)
+                                      ] 
 
 -- | Main function
 --

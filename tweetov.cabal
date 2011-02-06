@@ -10,7 +10,7 @@ Build-type:          Simple
 Cabal-version:       >= 1.2
 
 Executable tweetov
-  Ghc-options:       -Wall -O2 -fno-warn-unused-do-bind
+  Ghc-options:       -Wall -O2 -fno-warn-unused-do-bind -threaded
   Main-is:           Tweetov/Server.hs
   Hs-source-dirs:    src
   Other-modules:     Tweetov.Templates,
