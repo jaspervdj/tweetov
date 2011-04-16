@@ -1,5 +1,9 @@
+-- | Web application
+--
 {-# LANGUAGE OverloadedStrings #-}
-module Main where
+module Tweetov.Application
+    ( application
+    ) where
 
 import Control.Monad.Trans (liftIO)
 import Control.Applicative ((<|>))
@@ -9,24 +13,28 @@ import Data.Monoid (mempty, mempty)
 import Codec.Binary.UTF8.String (decode)
 import qualified Data.ByteString as SB
 import Snap.Types
-import Snap.Http.Server (httpServe) 
-import Snap.Http.Server.Config ( Config, defaultConfig
-                               , setAccessLog, setErrorLog
-                               )
 import Snap.Util.FileServe (serveDirectory)
 import qualified Data.Text.Encoding as T
-import Text.Blaze (unsafeByteString)
+import Text.Blaze (Html, unsafeByteString)
+import Text.Blaze.Renderer.Utf8 (renderHtml)
 
 import Tweetov.Twitter
 import Tweetov.Twitter.Parse
 import Tweetov.Twitter.Markov
 import Tweetov.Twitter.Redis
-import Tweetov.Templates
+import qualified Tweetov.Views as Views
+
+-- | Send blaze output to snap.
+--
+setBlaze :: Html -> Snap ()
+setBlaze response = do
+    modifyResponse $ addHeader "Content-Type" "text/html; charset=UTF-8"
+    writeLBS $ renderHtml response
 
 -- | Site root
 --
 root :: Snap ()
-root = setBlaze $ rootTemplate mempty mempty
+root = setBlaze $ Views.root mempty mempty
 
 -- | Progress using a parameter
 --
@@ -44,57 +52,46 @@ withParam name handler = do
 
 -- | Request a tweet
 --
-tweet :: RandomGen g => g -> Snap ()
-tweet gen = withParam "data" $ \json -> withParam "user" $ \u -> do
-    let ut = getUserTweets $ decode $ SB.unpack json
+generateTweet :: RandomGen g => g -> Snap ()
+generateTweet gen = withParam "data" $ \json -> withParam "user" $ \u -> do
+    let ut = parseTweets $ decode $ SB.unpack json
         user' = T.decodeUtf8 u
         randoms' = randoms gen
     case ut of
-        Nothing -> addBlaze "Parse error."
+        Nothing -> setBlaze "Parse error."
         Just tweets -> do
             let tweet' = markovTweet user' tweets randoms'
             id' <- liftIO $ withRedis $ \r -> storeTweet r tweet'
-            addBlaze $ tweetSection tweet' id'
+            setBlaze $ Views.tweet tweet' id'
+
+-- | Link to a tweet
+--
+tweet :: Snap ()
+tweet = withParam "id" $ \id' -> do
+    let nid = read $ decode $ SB.unpack id'
+    t <- liftIO $ withRedis $ \r -> getTweet r nid
+    case t of
+        Nothing -> setBlaze "Tweet not found."
+        Just tweet' -> setBlaze $ Views.root
+            (Views.tweet tweet' nid)
+            (Views.userAjax $ tweetAuthor tweet')
 
 -- | Request a user
 --
 user :: Snap ()
 user = withParam "data" $ \json ->
-    let ui = getUserInfo $ decode $ SB.unpack json
+    let ui = parseUser $ decode $ SB.unpack json
     in case ui of
-        Nothing -> addBlaze "Parse error."
-        Just userInfo -> addBlaze $ userSection userInfo
-
--- | Link to a tweet
---
-tweetLink :: Snap ()
-tweetLink = withParam "id" $ \id' -> do
-    let nid = read $ decode $ SB.unpack id'
-    t <- liftIO $ withRedis $ \r -> getTweet r nid
-    case t of
-        Nothing -> setBlaze "Tweet not found."
-        Just tweet' -> setBlaze $ rootTemplate (tweetSection tweet' nid)
-                                               (setUser $ tweetAuthor tweet')
+        Nothing ->       setBlaze "Parse error."
+        Just userInfo -> setBlaze $ Views.user userInfo
 
 -- | Site handler
 --
-site :: Snap ()
-site = do
+application :: Snap ()
+application = do
     gen <- liftIO newStdGen
     serveDirectory "static" <|> route [ ("", ifTop root)
-                                      , ("tweet/:id", tweet gen)
+                                      , ("tweet/:id", generateTweet gen)
                                       , ("user/", user)
-                                      , (":id", tweetLink)
+                                      , (":id", tweet)
                                       ] 
-
--- | Main function
---
-main :: IO ()
-main = httpServe config site
-
--- | Site config
---
-config :: Config Snap a
-config = setAccessLog Nothing
-       $ setErrorLog Nothing
-       $ defaultConfig

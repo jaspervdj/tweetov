@@ -22,7 +22,7 @@ import Tweetov.Twitter
 --
 withRedis :: (Redis -> IO a) -> IO a
 withRedis f = do
-    redis <- connect localhost defaultPort
+    redis <- connect "127.0.0.1" defaultPort
     x <- f redis
     disconnect redis
     return x
@@ -52,7 +52,7 @@ setItem redis key item = do
 
 -- | Store a tweet in the database
 --
-storeTweet :: Redis -> TweetInfo -> IO Int
+storeTweet :: Redis -> Tweet -> IO Int
 storeTweet redis tweet = do
     id' <- getNewTweetID redis
     setItem redis (getTweetKey id') $ encode tweet
@@ -67,7 +67,7 @@ getNumberOfTweets redis = do
 
 -- | Get a tweet from the database
 --
-getTweet :: Redis -> Int -> IO (Maybe TweetInfo)
+getTweet :: Redis -> Int -> IO (Maybe Tweet)
 getTweet redis id' = do
     item <- getItem redis $ getTweetKey id'
     return $ decode <$> item

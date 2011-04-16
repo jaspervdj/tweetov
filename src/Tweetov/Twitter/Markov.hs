@@ -9,12 +9,12 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import Data.Char (isAlphaNum)
 
-import Tweetov.Twitter (TweetInfo (..))
+import Tweetov.Twitter (Tweet (..))
 import Tweetov.Data.Markov
 
 -- | Extract a 'Sample' from a tweet.
 --
-sampleFromTweet :: TweetInfo -> Sample Text
+sampleFromTweet :: Tweet -> Sample Text
 sampleFromTweet = Sample . filter (not . T.null)
                 . map (T.filter (`notElem` "()\""))
                 . filter goodWord
@@ -24,16 +24,16 @@ sampleFromTweet = Sample . filter (not . T.null)
 
 -- | Generate a random tweet
 --
-markovTweet :: Text         -- ^ Author
-            -> [TweetInfo]  -- ^ Tweet samples
-            -> [Int]        -- ^ Random pool
-            -> TweetInfo    -- ^ Result
+markovTweet :: Text     -- ^ Author
+            -> [Tweet]  -- ^ Tweet samples
+            -> [Int]    -- ^ Random pool
+            -> Tweet    -- ^ Result
 markovTweet author tweets seeds =
     let samples = map sampleFromTweet tweets
         model = fromSamples True samples
-    in TweetInfo { tweetWords  = sentence tooLarge model seeds
-                 , tweetAuthor = author
-                 }
+    in Tweet { tweetWords  = sentence tooLarge model seeds
+             , tweetAuthor = author
+             }
 
 -- | Check if a tweet is already too large
 --

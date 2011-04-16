@@ -1,8 +1,8 @@
 -- | Twitter-related data structures.
 --
 module Tweetov.Twitter
-    ( UserInfo (..)
-    , TweetInfo (..)
+    ( User (..)
+    , Tweet (..)
     ) where
 
 import Control.Applicative ((<$>))
@@ -13,7 +13,7 @@ import qualified Data.Text.Encoding as T
 
 -- | Information about a twitter user
 --
-data UserInfo = UserInfo
+data User = User
     { userName      :: Text
     , userFollowers :: Int
     , userFollowing :: Int
@@ -24,16 +24,16 @@ data UserInfo = UserInfo
 
 -- | A tweet
 --
-data TweetInfo = TweetInfo
+data Tweet = Tweet
     { tweetWords  :: [Text]
     , tweetAuthor :: Text
     } deriving (Show, Eq, Ord)
 
-instance Binary TweetInfo where
+instance Binary Tweet where
     put t = do
         put $ T.encodeUtf8 $ T.unwords $ tweetWords t
         put $ T.encodeUtf8 $ tweetAuthor t
     get = do
         w <- T.words . T.decodeUtf8 <$> get
         a <- T.decodeUtf8 <$> get
-        return $ TweetInfo w a
+        return $ Tweet w a

@@ -2,8 +2,8 @@
 --
 {-# LANGUAGE OverloadedStrings #-}
 module Tweetov.Twitter.Parse
-    ( getUserInfo
-    , getUserTweets
+    ( parseUser
+    , parseTweets
     ) where
 
 import Control.Applicative ((<$>))
@@ -13,16 +13,16 @@ import Data.Maybe (mapMaybe)
 import qualified Data.Text as T
 import Text.JSON
 
-import Tweetov.Twitter (UserInfo (..), TweetInfo (..))
+import Tweetov.Twitter (User (..), Tweet (..))
 
 -- | Load information about a twitter user
 --
-getUserInfo :: String          -- ^ JSON data
-            -> Maybe UserInfo  -- ^ Result
-getUserInfo body = do
+parseUser :: String      -- ^ JSON data
+          -> Maybe User  -- ^ Result
+parseUser body = do
     result <- resultToMaybe (decode body)
     case result of
-        JSObject object -> liftM UserInfo
+        JSObject object -> liftM User
             (T.pack <$> getField "screen_name" object)
                 `ap` getField "followers_count" object
                 `ap` getField "friends_count" object
@@ -33,20 +33,20 @@ getUserInfo body = do
 
 -- | Get the tweets of a user
 --
-getUserTweets :: String             -- ^ JSON
-              -> Maybe [TweetInfo]  -- ^ List of tweets
-getUserTweets body = do
+parseTweets :: String         -- ^ JSON
+            -> Maybe [Tweet]  -- ^ List of tweets
+parseTweets body = do
     result <- resultToMaybe $ decode body
     list <- case result of JSArray l -> return l
                            _         -> Nothing
-    return $ mapMaybe getTweet list
+    return $ mapMaybe parseTweet list
 
 -- | Pure function to parse in a tweet
 --
-getTweet :: JSValue -> Maybe TweetInfo
-getTweet value = case value of
+parseTweet :: JSValue -> Maybe Tweet
+parseTweet value = case value of
     JSObject object ->
-        liftM TweetInfo (T.words . T.pack <$> getField "text" object)
+        liftM Tweet (T.words . T.pack <$> getField "text" object)
             -- Do not parse user for now
             `ap` return "unknown"
     _ -> Nothing 

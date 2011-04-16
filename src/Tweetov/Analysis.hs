@@ -21,7 +21,7 @@ import Tweetov.Twitter.Redis
 
 -- | Create a map with the tweets per user
 --
-perUserMap :: IO (Map Text (Vector TweetInfo))
+perUserMap :: IO (Map Text (Vector Tweet))
 perUserMap = withRedis $ \redis -> do
     n <- getNumberOfTweets redis
     foldM (addTweet redis) M.empty [0 .. n]
