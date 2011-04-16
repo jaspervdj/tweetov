@@ -1,5 +1,5 @@
 Name:                tweetov
-Version:             0.2.2
+Version:             0.2.3
 Synopsis:            Markov chains from tweets
 License-file:        LICENSE
 Author:              Jasper Van der Jeugt
@@ -11,9 +11,10 @@ Cabal-version:       >= 1.2
 
 Executable tweetov
   Ghc-options:       -Wall -O2 -fno-warn-unused-do-bind -threaded
-  Main-is:           Tweetov/Server.hs
+  Main-is:           Tweetov/Main.hs
   Hs-source-dirs:    src
-  Other-modules:     Tweetov.Templates,
+  Other-modules:     Tweetov.Application,
+                     Tweetov.Views,
                      Tweetov.Twitter,
                      Tweetov.Twitter.Parse,
                      Tweetov.Twitter.Markov,
