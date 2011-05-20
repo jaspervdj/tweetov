@@ -6,23 +6,33 @@ module Tweetov.Application
     ) where
 
 import Control.Monad.Trans (liftIO)
-import Control.Applicative ((<|>))
+import Control.Applicative ((<$>), (<|>))
 import System.Random (RandomGen, newStdGen, randoms)
-import Data.Monoid (mempty, mempty)
+import Data.Monoid (mempty)
+import Control.Monad (join)
 
 import Codec.Binary.UTF8.String (decode)
 import qualified Data.ByteString as SB
 import Snap.Types
 import Snap.Util.FileServe (serveDirectory)
 import qualified Data.Text.Encoding as T
-import Text.Blaze (Html, unsafeByteString)
+import Text.Blaze (Html)
 import Text.Blaze.Renderer.Utf8 (renderHtml)
+import Data.Aeson (FromJSON (..), json)
+import Data.Aeson.Types (parseEither)
+import Data.Attoparsec (parseOnly)
 
 import Tweetov.Twitter
-import Tweetov.Twitter.Parse
 import Tweetov.Twitter.Markov
 import Tweetov.Twitter.Redis
 import qualified Tweetov.Views as Views
+
+-- | Utility: parse JSON from a strict bytestring
+--
+parseJson :: FromJSON a => SB.ByteString -> Maybe a
+parseJson bs = case parseOnly json bs >>= parseEither parseJSON of
+    Left _  -> Nothing
+    Right x -> x
 
 -- | Send blaze output to snap.
 --
@@ -36,54 +46,35 @@ setBlaze response = do
 root :: Snap ()
 root = setBlaze $ Views.root mempty mempty
 
--- | Progress using a parameter
---
-withParam :: SB.ByteString               -- ^ Param name
-          -> (SB.ByteString -> Snap ())  -- ^ Handler
-          -> Snap ()                     -- ^ Result
-withParam name handler = do
-    value <- getParam name
-    case value of
-        Just v  -> handler v
-        Nothing -> setBlaze $ do
-            "Error: param "
-            unsafeByteString name
-            " not set"
-
 -- | Request a tweet
 --
 generateTweet :: RandomGen g => g -> Snap ()
-generateTweet gen = withParam "data" $ \json -> withParam "user" $ \u -> do
-    let ut = parseTweets $ decode $ SB.unpack json
-        user' = T.decodeUtf8 u
-        randoms' = randoms gen
-    case ut of
-        Nothing -> setBlaze "Parse error."
-        Just tweets -> do
-            let tweet' = markovTweet user' tweets randoms'
-            id' <- liftIO $ withRedis $ \r -> storeTweet r tweet'
-            setBlaze $ Views.tweet tweet' id'
+generateTweet gen = do
+    Just d <- getParam "data"
+    liftIO $ SB.writeFile "data.json" d
+    Just tweets <- join . fmap parseJson <$> getParam "data"
+    Just user' <- fmap T.decodeUtf8 <$> getParam "user"
+    let randoms' = randoms gen
+        tweet' = markovTweet user' tweets randoms'
+    id' <- liftIO $ withRedis $ \r -> storeTweet r tweet'
+    setBlaze $ Views.tweet tweet' id'
 
 -- | Link to a tweet
 --
 tweet :: Snap ()
-tweet = withParam "id" $ \id' -> do
-    let nid = read $ decode $ SB.unpack id'
-    t <- liftIO $ withRedis $ \r -> getTweet r nid
-    case t of
-        Nothing -> setBlaze "Tweet not found."
-        Just tweet' -> setBlaze $ Views.root
-            (Views.tweet tweet' nid)
-            (Views.userAjax $ tweetAuthor tweet')
+tweet = do
+    Just id' <- fmap (read . decode . SB.unpack) <$> getParam "id"
+    Just tweet' <- liftIO $ withRedis $ \r -> getTweet r id'
+    setBlaze $ Views.root
+        (Views.tweet tweet' id')
+        (Views.userAjax $ tweetAuthor tweet')
 
 -- | Request a user
 --
 user :: Snap ()
-user = withParam "data" $ \json ->
-    let ui = parseUser $ decode $ SB.unpack json
-    in case ui of
-        Nothing ->       setBlaze "Parse error."
-        Just userInfo -> setBlaze $ Views.user userInfo
+user = do
+    Just userInfo <- join . fmap parseJson <$> getParam "data"
+    setBlaze $ Views.user userInfo
 
 -- | Site handler
 --
@@ -91,7 +82,7 @@ application :: Snap ()
 application = do
     gen <- liftIO newStdGen
     serveDirectory "static" <|> route [ ("", ifTop root)
-                                      , ("tweet/:id", generateTweet gen)
+                                      , ("tweet/", generateTweet gen)
                                       , ("user/", user)
                                       , (":id", tweet)
                                       ] 

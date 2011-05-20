@@ -16,7 +16,6 @@ Executable tweetov
   Other-modules:     Tweetov.Application,
                      Tweetov.Views,
                      Tweetov.Twitter,
-                     Tweetov.Twitter.Parse,
                      Tweetov.Twitter.Markov,
                      Tweetov.Twitter.Redis,
                      Tweetov.Data.Markov
@@ -28,9 +27,10 @@ Executable tweetov
                      text >= 0.7,
                      random >= 1,
                      containers >= 0.3,
-                     json >= 0.4,
                      HTTP >= 4000,
                      bytestring >= 0.9,
                      utf8-string >= 0.3,
                      redis >= 0.7,
-                     binary >= 0.5
+                     binary >= 0.5,
+                     aeson >= 0.3,
+                     attoparsec >= 0.8
