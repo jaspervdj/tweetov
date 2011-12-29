@@ -12,15 +12,14 @@ import Data.Monoid (mempty)
 import Control.Monad (join)
 
 import Codec.Binary.UTF8.String (decode)
-import qualified Data.ByteString as SB
-import Snap.Types
-import Snap.Util.FileServe (serveDirectory)
-import qualified Data.Text.Encoding as T
-import Text.Blaze (Html)
-import Text.Blaze.Renderer.Utf8 (renderHtml)
 import Data.Aeson (FromJSON (..), json)
 import Data.Aeson.Types (parseEither)
 import Data.Attoparsec (parseOnly)
+import Snap.Blaze (blaze)
+import Snap.Core
+import Snap.Util.FileServe (serveDirectory)
+import qualified Data.ByteString as SB
+import qualified Data.Text.Encoding as T
 
 import Tweetov.Twitter
 import Tweetov.Twitter.Markov
@@ -34,17 +33,10 @@ parseJson bs = case parseOnly json bs >>= parseEither parseJSON of
     Left _  -> Nothing
     Right x -> x
 
--- | Send blaze output to snap.
---
-setBlaze :: Html -> Snap ()
-setBlaze response = do
-    modifyResponse $ addHeader "Content-Type" "text/html; charset=UTF-8"
-    writeLBS $ renderHtml response
-
 -- | Site root
 --
 root :: Snap ()
-root = setBlaze $ Views.root mempty mempty
+root = blaze $ Views.root mempty mempty
 
 -- | Request a tweet
 --
@@ -57,7 +49,7 @@ generateTweet gen = do
     let randoms' = randoms gen
         tweet' = markovTweet user' tweets randoms'
     id' <- liftIO $ withRedis $ \r -> storeTweet r tweet'
-    setBlaze $ Views.tweet tweet' id'
+    blaze $ Views.tweet tweet' id'
 
 -- | Link to a tweet
 --
@@ -65,7 +57,7 @@ tweet :: Snap ()
 tweet = do
     Just id' <- fmap (read . decode . SB.unpack) <$> getParam "id"
     Just tweet' <- liftIO $ withRedis $ \r -> getTweet r id'
-    setBlaze $ Views.root
+    blaze $ Views.root
         (Views.tweet tweet' id')
         (Views.userAjax $ tweetAuthor tweet')
 
@@ -74,7 +66,7 @@ tweet = do
 user :: Snap ()
 user = do
     Just userInfo <- join . fmap parseJson <$> getParam "data"
-    setBlaze $ Views.user userInfo
+    blaze $ Views.user userInfo
 
 -- | Site handler
 --

@@ -10,27 +10,32 @@ Build-type:          Simple
 Cabal-version:       >= 1.2
 
 Executable tweetov
-  Ghc-options:       -Wall -O2 -fno-warn-unused-do-bind -threaded
-  Main-is:           Tweetov/Main.hs
-  Hs-source-dirs:    src
-  Other-modules:     Tweetov.Application,
-                     Tweetov.Views,
-                     Tweetov.Twitter,
-                     Tweetov.Twitter.Markov,
-                     Tweetov.Twitter.Redis,
-                     Tweetov.Data.Markov
-  Build-depends:     base >= 4 && < 5,
-                     snap-core >= 0.2,
-                     snap-server >= 0.2,
-                     mtl >= 2,
-                     blaze-html >= 0.2,
-                     text >= 0.7,
-                     random >= 1,
-                     containers >= 0.3,
-                     HTTP >= 4000,
-                     bytestring >= 0.9,
-                     utf8-string >= 0.3,
-                     redis >= 0.7,
-                     binary >= 0.5,
-                     aeson >= 0.3,
-                     attoparsec >= 0.8
+  Ghc-options:    -Wall -O2 -fno-warn-unused-do-bind -threaded
+  Main-is:        Tweetov/Main.hs
+  Hs-source-dirs: src
+
+  Other-modules:
+    Tweetov.Application,
+    Tweetov.Views,
+    Tweetov.Twitter,
+    Tweetov.Twitter.Markov,
+    Tweetov.Twitter.Redis,
+    Tweetov.Data.Markov
+
+  Build-depends:
+    HTTP         >= 4000,
+    aeson        >= 0.3,
+    attoparsec   >= 0.8,
+    base         >= 4 && < 5,
+    binary       >= 0.5,
+    blaze-html   >= 0.2,
+    bytestring   >= 0.9,
+    containers   >= 0.3,
+    mtl          >= 2,
+    random       >= 1,
+    redis        >= 0.7,
+    snap-blaze   >= 0.0.0.1,
+    snap-core    >= 0.2,
+    snap-server  >= 0.2,
+    text         >= 0.7,
+    utf8-string  >= 0.3

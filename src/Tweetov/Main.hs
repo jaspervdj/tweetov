@@ -3,13 +3,9 @@ module Main
     ( main
     ) where
 
-import Snap.Http.Server (httpServe) 
-import Snap.Http.Server.Config ( ConfigListen (..)
-                               , emptyConfig, addListen
-                               , setAccessLog, setErrorLog
-                               )
 import System.Environment (getArgs, getProgName)
 import qualified Data.ByteString.Char8 as B
+import qualified Snap.Http.Server as Snap
 
 import Tweetov.Application
 
@@ -20,12 +16,13 @@ main = do
     args <- getArgs
     progName <- getProgName
     case args of
-        [address, port] -> httpServe (config address port) application
+        [address, port] -> Snap.httpServe (config address port) application
         _               -> putStrLn $
             "Usage: " ++ progName ++ " <listen address> <port>"
   where
     config address port =
-        addListen (ListenHttp (B.pack address) (read port)) $
-        setAccessLog Nothing $
-        setErrorLog Nothing $
-        emptyConfig
+		Snap.setBind (B.pack address) $
+		Snap.setPort (read port) $
+        Snap.setAccessLog Snap.ConfigNoLog $
+        Snap.setErrorLog Snap.ConfigNoLog $
+        Snap.emptyConfig
