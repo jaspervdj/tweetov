@@ -11,13 +11,13 @@ import System.Random (RandomGen, newStdGen, randoms)
 import Data.Monoid (mempty)
 import Control.Monad (join)
 
-import Codec.Binary.UTF8.String (decode)
 import Data.Aeson (FromJSON (..), json)
 import Data.Aeson.Types (parseEither)
 import Data.Attoparsec (parseOnly)
 import Snap.Blaze (blaze)
 import Snap.Core
 import Snap.Util.FileServe (serveDirectory)
+import qualified Data.Text as T
 import qualified Data.ByteString as SB
 import qualified Data.Text.Encoding as T
 
@@ -55,7 +55,7 @@ generateTweet gen = do
 --
 tweet :: Snap ()
 tweet = do
-    Just id' <- fmap (read . decode . SB.unpack) <$> getParam "id"
+    Just id' <- fmap (read . T.unpack . T.decodeUtf8) <$> getParam "id"
     Just tweet' <- liftIO $ withRedis $ \r -> getTweet r id'
     blaze $ Views.root
         (Views.tweet tweet' id')

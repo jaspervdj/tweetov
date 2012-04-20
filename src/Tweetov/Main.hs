@@ -25,4 +25,5 @@ main = do
 		Snap.setPort (read port) $
         Snap.setAccessLog Snap.ConfigNoLog $
         Snap.setErrorLog Snap.ConfigNoLog $
+        Snap.setVerbose False $
         Snap.emptyConfig

@@ -23,19 +23,17 @@ Executable tweetov
     Tweetov.Data.Markov
 
   Build-depends:
-    HTTP         >= 4000,
-    aeson        >= 0.3,
-    attoparsec   >= 0.8,
-    base         >= 4 && < 5,
-    binary       >= 0.5,
-    blaze-html   >= 0.2,
-    bytestring   >= 0.9,
-    containers   >= 0.3,
-    mtl          >= 2,
-    random       >= 1,
-    redis        >= 0.7,
-    snap-blaze   >= 0.0.0.1,
-    snap-core    >= 0.2,
-    snap-server  >= 0.2,
-    text         >= 0.7,
-    utf8-string  >= 0.3
+    base        >= 4    && < 5,
+    aeson       >= 0.6  && < 0.7,
+    text        >= 0.11 && < 0.12,
+    binary      >= 0.5  && < 0.6,
+    blaze-html  >= 0.5  && < 0.6,
+    redis       >= 0.12 && < 0.13,
+    bytestring  >= 0.9  && < 0.10,
+    containers  >= 0.4  && < 0.5,
+    snap-core   >= 0.8  && < 0.9,
+    snap-blaze  >= 0.1  && < 0.2,
+    attoparsec  >= 0.10 && < 0.11,
+    random      >= 1.0  && < 1.1,
+    mtl         >= 2.0  && < 2.2,
+    snap-server >= 0.8  && < 0.9

@@ -10,7 +10,7 @@ import Data.Monoid (mconcat, mappend, mempty)
 import Data.Text (Text)
 import qualified Data.Text as T
 
-import Text.Blaze
+import Text.Blaze.Html
 import Text.Blaze.Html5 (a)
 import Text.Blaze.Html5.Attributes (href)
 
