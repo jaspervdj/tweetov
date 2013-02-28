@@ -9,9 +9,7 @@ module Tweetov.Twitter
 import Control.Monad (mzero)
 import Control.Applicative ((<$>), (<*>), pure)
 import Data.Text (Text)
-import Data.Binary (Binary, get, put)
 import qualified Data.Text as T
-import qualified Data.Text.Encoding as T
 
 import Data.Aeson
 
@@ -48,12 +46,3 @@ instance FromJSON Tweet where
         <$> (fmap T.words $ o .: "text")
         <*> pure "unknown"
     parseJSON _ = mzero
-
-instance Binary Tweet where
-    put t = do
-        put $ T.encodeUtf8 $ T.unwords $ tweetWords t
-        put $ T.encodeUtf8 $ tweetAuthor t
-    get = do
-        w <- T.words . T.decodeUtf8 <$> get
-        a <- T.decodeUtf8 <$> get
-        return $ Tweet w a

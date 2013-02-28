@@ -54,20 +54,19 @@ input = H.div ! A.id "inputsection" $ H.form
     $ do H.input ! type_ "text" ! name "usernamefield"
                  ! A.id "usernamefield" ! value "@DalaiLama"
                  -- Clear field on click.
-                 ! onfocus (preEscapedStringValue
+                 ! onfocus (preEscapedToValue (
                      "if(this.value == this.defaultValue) {\
                      \    $(this).val('');\
-                     \};")
+                     \};" :: String))
          H.input ! type_ "submit"
                  ! A.id "submitfield"
                  ! value "Submit"
 
 -- | Section containing a tweet.
 --
-tweet :: Tweet -> Int -> Html
-tweet tweet' id' = H.div ! A.id "tweetsection" $ do
+tweet :: Tweet -> Html
+tweet tweet' = H.div ! A.id "tweetsection" $
     H.div ! A.id "tweet" $ viewTweet tweet'
-    H.div ! A.id "tweetlink" $ a ! href (toValue id') $ "link (expires)"
 
 -- | Section containing the requested twitter user.
 --

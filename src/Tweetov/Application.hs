@@ -17,13 +17,10 @@ import Data.Attoparsec (parseOnly)
 import Snap.Blaze (blaze)
 import Snap.Core
 import Snap.Util.FileServe (serveDirectory)
-import qualified Data.Text as T
 import qualified Data.ByteString as SB
 import qualified Data.Text.Encoding as T
 
-import Tweetov.Twitter
 import Tweetov.Twitter.Markov
-import Tweetov.Twitter.Redis
 import qualified Tweetov.Views as Views
 
 -- | Utility: parse JSON from a strict bytestring
@@ -42,24 +39,11 @@ root = blaze $ Views.root mempty mempty
 --
 generateTweet :: RandomGen g => g -> Snap ()
 generateTweet gen = do
-    Just d <- getParam "data"
-    liftIO $ SB.writeFile "data.json" d
     Just tweets <- join . fmap parseJson <$> getParam "data"
     Just user' <- fmap T.decodeUtf8 <$> getParam "user"
     let randoms' = randoms gen
         tweet' = markovTweet user' tweets randoms'
-    id' <- liftIO $ withRedis $ \r -> storeTweet r tweet'
-    blaze $ Views.tweet tweet' id'
-
--- | Link to a tweet
---
-tweet :: Snap ()
-tweet = do
-    Just id' <- fmap (read . T.unpack . T.decodeUtf8) <$> getParam "id"
-    Just tweet' <- liftIO $ withRedis $ \r -> getTweet r id'
-    blaze $ Views.root
-        (Views.tweet tweet' id')
-        (Views.userAjax $ tweetAuthor tweet')
+    blaze $ Views.tweet tweet'
 
 -- | Request a user
 --
@@ -76,5 +60,4 @@ application = do
     serveDirectory "static" <|> route [ ("", ifTop root)
                                       , ("tweet/", generateTweet gen)
                                       , ("user/", user)
-                                      , (":id", tweet)
-                                      ] 
+                                      ]

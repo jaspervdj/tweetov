@@ -19,7 +19,7 @@ import Tweetov.Twitter (Tweet, tweetWords)
 -- | Produce a link (if necessary) from a word.
 --
 linkWord :: Text -> Html
-linkWord word 
+linkWord word
     -- Empty word (should not happen)
     | T.null word = mempty
 
@@ -31,14 +31,14 @@ linkWord word
     | T.head word == '#' =
         a ! href ("http://search.twitter.com/search?q=%23"
                     `mappend` toValue tail')
-          $ preEscapedText word
+          $ preEscapedToHtml word
 
     -- Link
     | "http://" `T.isPrefixOf` word =
-        a ! href (toValue word) $ preEscapedText word
+        a ! href (toValue word) $ preEscapedToHtml word
 
     -- Regular word
-    | otherwise = preEscapedText word
+    | otherwise = preEscapedToHtml word
   where
     tail' = T.tail word
 
